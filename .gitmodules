@@ -1,0 +1,6 @@
+[submodule "deps/utils"]
+	path = deps/utils
+	url = git@github.com:RobertZenz/minetest-australopithecus-utils.git
+[submodule "deps/worldgen-utils"]
+	path = deps/worldgen-utils
+	url = git@github.com:RobertZenz/minetest-australopithecus-worldgen-utils.git
