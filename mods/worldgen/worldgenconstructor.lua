@@ -34,6 +34,7 @@ function WorldGenConstructor:new(name)
 		name = name,
 		noises = List:new(),
 		nodes = List:new(),
+		objects = List:new(),
 		params = List:new(),
 		run_2d = nil,
 		run_3d = nil,
@@ -47,6 +48,13 @@ function WorldGenConstructor:new(name)
 	return instance
 end
 
+
+function WorldGenConstructor:add_object(name, object)
+	self.objects:add({
+		name = name,
+		object = object
+	})
+end
 
 function WorldGenConstructor:add_param(name, value)
 	self.params:add({

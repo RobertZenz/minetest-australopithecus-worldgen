@@ -53,6 +53,7 @@ function WorldGen:constructor_to_module(constructor)
 		nodes = {},
 		noisemaps = {},
 		noises = {},
+		objects = {},
 		params = {},
 		run_2d = constructor.run_2d,
 		run_3d = constructor.run_3d,
@@ -104,6 +105,10 @@ function WorldGen:constructor_to_module(constructor)
 			map = noisemap,
 			type = noise_param.type
 		}
+	end)
+	
+	constructor.objects:foreach(function(object, index)
+		module.objects[object.name] = object.object
 	end)
 	
 	constructor.params:foreach(function(param, index)
@@ -163,6 +168,12 @@ function WorldGen:register_from_table(name, table)
 				value.spready,
 				value.spreadz,
 				value.flags)
+		end
+	end
+	
+	if table.objects ~= nil then
+		for index, value in ipairs(table.objects) do
+			constructor:add_object(value.name, value.object)
 		end
 	end
 	
