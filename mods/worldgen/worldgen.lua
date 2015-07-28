@@ -150,7 +150,7 @@ end
 function WorldGen:register_from_table(name, table)
 	local constructor = WorldGenConstructor:new()
 	
-	if tables.nodes ~= nil then
+	if table.nodes ~= nil then
 		for index, value in ipairs(table.nodes) do
 			constructor:require_node(value.name, value.node_name)
 		end
