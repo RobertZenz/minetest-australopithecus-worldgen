@@ -55,6 +55,8 @@ function WorldGen:constructor_to_module(constructor)
 		noises = {},
 		objects = {},
 		params = {},
+		pcgrandoms = {},
+		randoms = {},
 		run_2d = constructor.run_2d,
 		run_3d = constructor.run_3d,
 		run_after = constructor.run_after,
@@ -113,6 +115,14 @@ function WorldGen:constructor_to_module(constructor)
 	
 	constructor.params:foreach(function(param, index)
 		module.params[param.name] = param.value
+	end)
+	
+	constructor.pcgrandoms:foreach(function(pcgrandom, index)
+		module.pcgrandoms[pcgrandom.name] = self.noise_manager:get_random()
+	end)
+	
+	constructor.randoms:foreach(function(random, index)
+		module.pcgrandoms[pcgrandom.name] = self.noise_manager:get_pcgrandom()
 	end)
 	
 	return module

@@ -36,6 +36,8 @@ function WorldGenConstructor:new(name)
 		nodes = List:new(),
 		objects = List:new(),
 		params = List:new(),
+		pcgrandoms = List:new(),
+		randoms = List:new(),
 		run_2d = nil,
 		run_3d = nil,
 		run_after = nil,
@@ -94,6 +96,18 @@ function WorldGenConstructor:require_noise3d(name, octaves, persistence, scale, 
 		spready = spready,
 		spreadz = spreadz,
 		flags = flags
+	})
+end
+
+function WorldGenConstructor:require_pcgrandom(name)
+	self.pcgrandoms:add({
+		name = name
+	})
+end
+
+function WorldGenConstructor:require_random(name)
+	self.randoms:add({
+		name = name
 	})
 end
 
