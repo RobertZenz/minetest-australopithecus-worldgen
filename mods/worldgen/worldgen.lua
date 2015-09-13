@@ -51,12 +51,12 @@ function WorldGen:constructor_to_module(constructor)
 		condition = constructor.condition,
 		name = constructor.name,
 		nodes = {},
-		noisemaps = {},
+		noise_bases = {},
 		noises = {},
 		objects = {},
 		params = {},
-		pcgrandoms = {},
-		randoms = {},
+		pcgrandom_bases = {},
+		random_bases = {},
 		run_2d = constructor.run_2d,
 		run_3d = constructor.run_3d,
 		run_after = constructor.run_after,
@@ -103,7 +103,7 @@ function WorldGen:constructor_to_module(constructor)
 			)
 		end
 		
-		module.noisemaps[noise_param.name] = {
+		module.noise_bases[noise_param.name] = {
 			map = noisemap,
 			type = noise_param.type
 		}
@@ -118,11 +118,11 @@ function WorldGen:constructor_to_module(constructor)
 	end)
 	
 	constructor.pcgrandoms:foreach(function(pcgrandom, index)
-		module.pcgrandoms[pcgrandom.name] = self.noise_manager:get_random()
+		module.pcgrandom_bases[pcgrandom.name] = self.noise_manager:get_random()
 	end)
 	
 	constructor.randoms:foreach(function(random, index)
-		module.pcgrandoms[pcgrandom.name] = self.noise_manager:get_pcgrandom()
+		module.pcgrandom_bases[pcgrandom.name] = self.noise_manager:get_pcgrandom()
 	end)
 	
 	return module
@@ -142,7 +142,7 @@ function WorldGen:init()
 end
 
 function WorldGen:prepare_module_noises(module, minp, maxp)
-	for key, value in pairs(module.noisemaps) do
+	for key, value in pairs(module.noise_bases) do
 		local valuemap = nil
 		
 		if value.type == "2D" then
@@ -162,6 +162,10 @@ function WorldGen:prepare_module_noises(module, minp, maxp)
 		
 		module.noises[key] = valuemap
 	end
+end
+
+function WorldGen:prepare_module_random(module, minp, maxp, seed)
+	
 end
 
 function WorldGen:register(name, module)
@@ -226,7 +230,7 @@ function WorldGen:register_from_table(name, table)
 	self.constructors:add(constructor)
 end
 
-function WorldGen:run(map_manipulator, minp, maxp)
+function WorldGen:run(map_manipulator, minp, maxp, seed)
 	if not self.initialized then
 		self:init()
 	end
@@ -245,7 +249,7 @@ function WorldGen:run(map_manipulator, minp, maxp)
 	stopwatch.start("worldgen.modules (" .. self.name .. ")")
 	
 	self.modules:foreach(function(module, index)
-		self:run_module(module, map_manipulator, metadata, minp, maxp)
+		self:run_module(module, map_manipulator, metadata, minp, maxp, seed)
 	end)
 	
 	log.info("--------------------------")
@@ -253,7 +257,7 @@ function WorldGen:run(map_manipulator, minp, maxp)
 	log.info("==========================\n")
 end
 
-function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp)
+function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed)
 	stopwatch.start("worldgen.module (" .. self.name .. ")")
 	
 	if module.condition == nil or module.condition(module, metadata, minp, maxp) then
