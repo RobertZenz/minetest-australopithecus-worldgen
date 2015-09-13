@@ -141,6 +141,29 @@ function WorldGen:init()
 	self.constructors = nil
 end
 
+function WorldGen:prepare_module_noises(module, minp, maxp)
+	for key, value in pairs(module.noisemaps) do
+		local valuemap = nil
+		
+		if value.type == "2D" then
+			valuemap = value.map:get2dMap({
+				x = minp.x,
+				y = minp.z
+			})
+			valuemap = arrayutil.swapped_reindex2d(valuemap, minp.x, minp.z)
+		elseif value.type == "3D" then
+			valuemap = value.map:get3dMap({
+				x = minp.x,
+				y = minp.y,
+				z = minp.z
+			})
+			valuemap = arrayutil.swapped_reindex3d(valuemap, minp.x, minp.y, minp.z)
+		end
+		
+		module.noises[key] = valuemap
+	end
+end
+
 function WorldGen:register(name, module)
 	if type(module) == "table" then
 		self:register_from_table(name, module)
@@ -222,56 +245,39 @@ function WorldGen:run(map_manipulator, minp, maxp)
 	stopwatch.start("worldgen.modules (" .. self.name .. ")")
 	
 	self.modules:foreach(function(module, index)
-		stopwatch.start("worldgen.module (" .. self.name .. ")")
-		
-		if module.condition == nil or module.condition(module, metadata, minp, maxp) then
-			for key, value in pairs(module.noisemaps) do
-				local valuemap = nil
-				
-				if value.type == "2D" then
-					valuemap = value.map:get2dMap({
-						x = minp.x,
-						y = minp.z
-					})
-					valuemap = arrayutil.swapped_reindex2d(valuemap, minp.x, minp.z)
-				elseif value.type == "3D" then
-					valuemap = value.map:get3dMap({
-						x = minp.x,
-						y = minp.y,
-						z = minp.z
-					})
-					valuemap = arrayutil.swapped_reindex3d(valuemap, minp.x, minp.y, minp.z)
-				end
-				
-				module.noises[key] = valuemap
-			end
-			
-			if module.run_before ~= nil then
-				module.run_before(module, metadata, map_manipulator, minp, maxp)
-			end
-			
-			worldgenutil.iterate3d(minp, maxp, function(x, z, y)
-				if module.run_3d ~= nil then
-					module.run_3d(module, metadata, map_manipulator, x, z, y)
-				end
-			end, function(x)
-				-- Nothing
-			end, function(x, z)
-				if module.run_2d ~= nil then
-					module.run_2d(module, metadata, map_manipulator, x, z)
-				end
-			end)
-			
-			if module.run_after ~= nil then
-				module.run_after(module, metadata, map_manipulator, minp, maxp)
-			end
-		end
-		
-		stopwatch.stop("worldgen.module (" .. self.name .. ")", module.name)
+		self:run_module(module, map_manipulator, metadata, minp, maxp)
 	end)
 	
 	log.info("--------------------------")
 	stopwatch.stop("worldgen.modules (" .. self.name .. ")", "Summary")
 	log.info("==========================\n")
+end
+
+function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp)
+	stopwatch.start("worldgen.module (" .. self.name .. ")")
+	
+	if module.condition == nil or module.condition(module, metadata, minp, maxp) then
+		self:prepare_module_noises(module, minp, maxp)
+		
+		if module.run_before ~= nil then
+			module.run_before(module, metadata, map_manipulator, minp, maxp)
+		end
+		
+		worldgenutil.iterate3d(minp, maxp, function(x, z, y)
+			if module.run_3d ~= nil then
+				module.run_3d(module, metadata, map_manipulator, x, z, y)
+			end
+		end, nil, function(x, z)
+			if module.run_2d ~= nil then
+				module.run_2d(module, metadata, map_manipulator, x, z)
+			end
+		end)
+		
+		if module.run_after ~= nil then
+			module.run_after(module, metadata, map_manipulator, minp, maxp)
+		end
+	end
+	
+	stopwatch.stop("worldgen.module (" .. self.name .. ")", module.name)
 end
 
