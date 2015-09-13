@@ -51,12 +51,14 @@ function WorldGen:constructor_to_module(constructor)
 		condition = constructor.condition,
 		name = constructor.name,
 		nodes = {},
-		noise_bases = {},
+		noise_objects = {},
 		noises = {},
 		objects = {},
 		params = {},
-		pcgrandom_bases = {},
-		random_bases = {},
+		pcgrandom_names = List:new(),
+		pcgrandoms = {},
+		pseudorandom_names = List:new(),
+		pseudorandoms = {},
 		run_2d = constructor.run_2d,
 		run_3d = constructor.run_3d,
 		run_after = constructor.run_after,
@@ -103,7 +105,7 @@ function WorldGen:constructor_to_module(constructor)
 			)
 		end
 		
-		module.noise_bases[noise_param.name] = {
+		module.noise_objects[noise_param.name] = {
 			map = noisemap,
 			type = noise_param.type
 		}
@@ -118,11 +120,11 @@ function WorldGen:constructor_to_module(constructor)
 	end)
 	
 	constructor.pcgrandoms:foreach(function(pcgrandom, index)
-		module.pcgrandom_bases[pcgrandom.name] = self.noise_manager:get_random()
+		module.pcgrandom_names:add(pcgrandom)
 	end)
 	
-	constructor.randoms:foreach(function(random, index)
-		module.pcgrandom_bases[pcgrandom.name] = self.noise_manager:get_pcgrandom()
+	constructor.pseudorandoms:foreach(function(pseudorandom, index)
+		module.pseudorandom_names:add(pseudorandom)
 	end)
 	
 	return module
@@ -142,7 +144,7 @@ function WorldGen:init()
 end
 
 function WorldGen:prepare_module_noises(module, minp, maxp)
-	for key, value in pairs(module.noise_bases) do
+	for key, value in pairs(module.noise_objects) do
 		local valuemap = nil
 		
 		if value.type == "2D" then
@@ -164,8 +166,16 @@ function WorldGen:prepare_module_noises(module, minp, maxp)
 	end
 end
 
-function WorldGen:prepare_module_random(module, minp, maxp, seed)
+function WorldGen:prepare_module_randoms(module, seed)
+	local random_source = PcgRandom(seed)
 	
+	module.pcgrandom_names:foreach(function(pcgrandom_name, index)
+		module.pcgrandoms[pcgrandom_name] = PcgRandom(random_source:next())
+	end)
+	
+	module.pseudorandom_names:foreach(function(pseudorandom_name, index)
+		module.pseudorandoms[pseudorandom_name] = PseudoRandom(random_source:next())
+	end)
 end
 
 function WorldGen:register(name, module)
@@ -262,6 +272,7 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 	
 	if module.condition == nil or module.condition(module, metadata, minp, maxp) then
 		self:prepare_module_noises(module, minp, maxp)
+		self:prepare_module_randoms(module, seed)
 		
 		if module.run_before ~= nil then
 			module.run_before(module, metadata, map_manipulator, minp, maxp)

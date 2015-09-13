@@ -37,7 +37,7 @@ function WorldGenConstructor:new(name)
 		objects = List:new(),
 		params = List:new(),
 		pcgrandoms = List:new(),
-		randoms = List:new(),
+		pseudorandoms = List:new(),
 		run_2d = nil,
 		run_3d = nil,
 		run_after = nil,
@@ -105,8 +105,8 @@ function WorldGenConstructor:require_pcgrandom(name)
 	})
 end
 
-function WorldGenConstructor:require_random(name)
-	self.randoms:add({
+function WorldGenConstructor:require_pseudorandom(name)
+	self.pseudorandoms:add({
 		name = name
 	})
 end
