@@ -30,7 +30,6 @@ WorldGen = {}
 
 function WorldGen:new(noise_manager, name)
 	local instance = {
-		cache = BlockedCache:new(),
 		constructors = List:new(),
 		initialized = false,
 		modules = List:new(),
