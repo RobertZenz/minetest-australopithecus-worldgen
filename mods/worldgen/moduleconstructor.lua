@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 
-WorldGenConstructor = {}
+ModuleConstructor = {}
 
 
-function WorldGenConstructor:new(name)
+function ModuleConstructor:new(name)
 	local instance = {
 		condition = nil,
 		name = name,
@@ -51,28 +51,28 @@ function WorldGenConstructor:new(name)
 end
 
 
-function WorldGenConstructor:add_object(name, object)
+function ModuleConstructor:add_object(name, object)
 	self.objects:add({
 		name = name,
 		object = object
 	})
 end
 
-function WorldGenConstructor:add_param(name, value)
+function ModuleConstructor:add_param(name, value)
 	self.params:add({
 		name = name,
 		value = value
 	})
 end
 
-function WorldGenConstructor:require_node(name, node_name)
+function ModuleConstructor:require_node(name, node_name)
 	self.nodes:add({
 		name = name,
 		node_name = node_name
 	})
 end
 
-function WorldGenConstructor:require_noise2d(name, octaves, persistence, scale, spreadx, spready, flags)
+function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, spreadx, spready, flags)
 	self.noises:add({
 		name = name,
 		type = "2D",
@@ -85,7 +85,7 @@ function WorldGenConstructor:require_noise2d(name, octaves, persistence, scale, 
 	})
 end
 		
-function WorldGenConstructor:require_noise3d(name, octaves, persistence, scale, spreadx, spready, spreadz, flags)
+function ModuleConstructor:require_noise3d(name, octaves, persistence, scale, spreadx, spready, spreadz, flags)
 	self.noises:add({
 		name = name,
 		type = "3D",
@@ -99,35 +99,35 @@ function WorldGenConstructor:require_noise3d(name, octaves, persistence, scale, 
 	})
 end
 
-function WorldGenConstructor:require_pcgrandom(name)
+function ModuleConstructor:require_pcgrandom(name)
 	self.pcgrandoms:add({
 		name = name
 	})
 end
 
-function WorldGenConstructor:require_pseudorandom(name)
+function ModuleConstructor:require_pseudorandom(name)
 	self.pseudorandoms:add({
 		name = name
 	})
 end
 
-function WorldGenConstructor:set_condition(condition_function)
+function ModuleConstructor:set_condition(condition_function)
 	self.condition = condition_function
 end
 
-function WorldGenConstructor:set_run_2d(run_function)
+function ModuleConstructor:set_run_2d(run_function)
 	self.run_2d = run_function
 end
 
-function WorldGenConstructor:set_run_3d(run_function)
+function ModuleConstructor:set_run_3d(run_function)
 	self.run_3d = run_function
 end
 
-function WorldGenConstructor:set_run_after(run_function)
+function ModuleConstructor:set_run_after(run_function)
 	self.run_after = run_function
 end
 
-function WorldGenConstructor:set_run_before(run_function)
+function ModuleConstructor:set_run_before(run_function)
 	self.run_before = run_function
 end
 

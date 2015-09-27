@@ -186,7 +186,7 @@ function WorldGen:register(name, module)
 end
 
 function WorldGen:register_from_constructor(name, constructor_function)
-	local constructor = WorldGenConstructor:new(name)
+	local constructor = ModuleConstructor:new(name)
 	
 	constructor_function(constructor)
 	
@@ -194,7 +194,7 @@ function WorldGen:register_from_constructor(name, constructor_function)
 end
 
 function WorldGen:register_from_table(name, table)
-	local constructor = WorldGenConstructor:new(name)
+	local constructor = ModuleConstructor:new(name)
 	
 	if table.nodes ~= nil then
 		for index, value in ipairs(table.nodes) do
