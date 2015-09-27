@@ -117,7 +117,7 @@ function WorldGen:prototype_to_module(prototype)
 		module.nodes[node.name] = nodeutil.get_id(node.node)
 		
 		log.info(self.name .. ": Added node \"",
-			node.node_name,
+			node.node,
 			"\" as \"",
 			node.name,
 			"\" with ID \"",
