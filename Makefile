@@ -4,6 +4,8 @@ mod_name := worldgen
 mods := mods
 release := release
 release_name := worldgen
+test := test
+
 
 all: doc
 
