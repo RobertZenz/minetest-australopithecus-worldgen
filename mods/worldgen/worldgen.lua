@@ -44,98 +44,10 @@ function WorldGen:new(name, noise_manager)
 	return instance
 end
 
-
-function WorldGen:constructor_to_module(constructor)
-	local module = {
-		condition = constructor.condition,
-		name = constructor.name,
-		nodes = {},
-		noise_objects = {},
-		noises = {},
-		objects = {},
-		params = {},
-		pcgrandom_names = List:new(),
-		pcgrandoms = {},
-		pseudorandom_names = List:new(),
-		pseudorandoms = {},
-		run_2d = constructor.run_2d,
-		run_3d = constructor.run_3d,
-		run_after = constructor.run_after,
-		run_before = constructor.run_before
-	}
-	
-	constructor.nodes:foreach(function(node, index)
-		module.nodes[node.name] = minetest.get_content_id(node.node_name)
-		
-		log.info(self.name .. ": Added node \"",
-			node.node_name,
-			"\" as \"",
-			node.name,
-			"\" with ID \"",
-			module.nodes[node.name],
-			"\".")
-		
-		if module.nodes[node.name] < 0 or module.nodes[node.name] == 127 then
-			log.error(self.name .. ": Node \"" .. node.node_name .. "\" was not found.")
-		end
-	end)
-	
-	constructor.noises2d:foreach(function(noise_param, index)
-		local noisemap = self.noise_manager:get_map2d(
-			noise_param.octaves,
-			noise_param.persistence,
-			noise_param.scale,
-			noise_param.spreadx,
-			noise_param.spready,
-			noise_param.flags
-		)
-		
-		module.noise_objects[noise_param.name] = {
-			map = noisemap,
-			type = "2D"
-		}
-	end)
-	
-	constructor.noises3d:foreach(function(noise_param, index)
-		local noisemap = self.noise_manager:get_map3d(
-			noise_param.octaves,
-			noise_param.persistence,
-			noise_param.scale,
-			noise_param.spreadx,
-			noise_param.spready,
-			noise_param.spreadz,
-			noise_param.flags
-		)
-		
-		module.noise_objects[noise_param.name] = {
-			map = noisemap,
-			type = "3D"
-		}
-	end)
-	
-	constructor.objects:foreach(function(object, index)
-		module.objects[object.name] = object.object
-	end)
-	
-	constructor.params:foreach(function(param, index)
-		module.params[param.name] = param.value
-	end)
-	
-	constructor.pcgrandoms:foreach(function(pcgrandom, index)
-		module.pcgrandom_names:add(pcgrandom)
-	end)
-	
-	constructor.pseudorandoms:foreach(function(pseudorandom, index)
-		module.pseudorandom_names:add(pseudorandom)
-	end)
-	
-	return module
-end
-
 function WorldGen:init()
-	self.prototypes:foreach(function(constructor, index)
-		log.info(self.name .. ": Initializing module \"" .. constructor.name .. "\"")
-		local module = self:constructor_to_module(constructor)
+	self.prototypes:foreach(function(prototype, index)
+		log.info(self.name .. ": Initializing module \"" .. prototype.name .. "\"")
+		local module = self:constructor_to_module(prototype)
 		self.modules:add(module)
 	end)
 	
@@ -178,6 +90,93 @@ function WorldGen:prepare_module_randoms(module, seed)
 	module.pseudorandom_names:foreach(function(pseudorandom_name, index)
 		module.pseudorandoms[pseudorandom_name] = PseudoRandom(random_source:next())
 	end)
+end
+
+function WorldGen:prototype_to_module(prototype)
+	local module = {
+		condition = prototype.condition,
+		name = constructor.name,
+		nodes = {},
+		noise_objects = {},
+		noises = {},
+		objects = {},
+		params = {},
+		pcgrandom_names = List:new(),
+		pcgrandoms = {},
+		pseudorandom_names = List:new(),
+		pseudorandoms = {},
+		run_2d = prototype.run_2d,
+		run_3d = prototype.run_3d,
+		run_after = prototype.run_after,
+		run_before = prototype.run_before
+	}
+	
+	prototype.nodes:foreach(function(node, index)
+		module.nodes[node.name] = nodeutil.get_id(node.node)
+		
+		log.info(self.name .. ": Added node \"",
+			node.node_name,
+			"\" as \"",
+			node.name,
+			"\" with ID \"",
+			module.nodes[node.name],
+			"\".")
+		
+		if module.nodes[node.name] < 0 or module.nodes[node.name] == 127 then
+			log.error(self.name .. ": Node \"" .. node.node_name .. "\" was not found.")
+		end
+	end)
+	
+	prototype.noises2d:foreach(function(noise_param, index)
+		local noisemap = self.noise_manager:get_map2d(
+			noise_param.octaves,
+			noise_param.persistence,
+			noise_param.scale,
+			noise_param.spreadx,
+			noise_param.spready,
+			noise_param.flags
+		)
+		
+		module.noise_objects[noise_param.name] = {
+			map = noisemap,
+			type = "2D"
+		}
+	end)
+	
+	prototype.noises3d:foreach(function(noise_param, index)
+		local noisemap = self.noise_manager:get_map3d(
+			noise_param.octaves,
+			noise_param.persistence,
+			noise_param.scale,
+			noise_param.spreadx,
+			noise_param.spready,
+			noise_param.spreadz,
+			noise_param.flags
+		)
+		
+		module.noise_objects[noise_param.name] = {
+			map = noisemap,
+			type = "3D"
+		}
+	end)
+	
+	prototype.objects:foreach(function(object, index)
+		module.objects[object.name] = object.object
+	end)
+	
+	prototype.params:foreach(function(param, index)
+		module.params[param.name] = param.value
+	end)
+	
+	prototype.pcgrandoms:foreach(function(pcgrandom, index)
+		module.pcgrandom_names:add(pcgrandom)
+	end)
+	
+	prototype.pseudorandoms:foreach(function(pseudorandom, index)
+		module.pseudorandom_names:add(pseudorandom)
+	end)
+	
+	return module
 end
 
 function WorldGen:register(name, module)

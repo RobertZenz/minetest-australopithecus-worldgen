@@ -66,10 +66,10 @@ function ModuleConstructor:add_param(name, value)
 	})
 end
 
-function ModuleConstructor:require_node(name, node_name)
+function ModuleConstructor:require_node(name, node)
 	self.nodes:add({
 		name = name,
-		node_name = node_name
+		node = node_name
 	})
 end
 
