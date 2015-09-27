@@ -32,7 +32,8 @@ function ModuleConstructor:new(name)
 	local instance = {
 		condition = nil,
 		name = name,
-		noises = List:new(),
+		noises2d = List:new(),
+		noises3d = List:new(),
 		nodes = List:new(),
 		objects = List:new(),
 		params = List:new(),
@@ -73,9 +74,8 @@ function ModuleConstructor:require_node(name, node_name)
 end
 
 function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, spreadx, spready, flags)
-	self.noises:add({
+	self.noises2d:add({
 		name = name,
-		type = "2D",
 		octaves = octaves,
 		persistence = persistence,
 		scale = scale,
@@ -86,9 +86,8 @@ function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, sp
 end
 		
 function ModuleConstructor:require_noise3d(name, octaves, persistence, scale, spreadx, spready, spreadz, flags)
-	self.noises:add({
+	self.noises3d:add({
 		name = name,
-		type = "3D",
 		octaves = octaves,
 		persistence = persistence,
 		scale = scale,

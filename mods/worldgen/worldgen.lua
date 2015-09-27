@@ -28,14 +28,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 WorldGen = {}
 
 
-function WorldGen:new(noise_manager, name)
+function WorldGen:new(name, noise_manager)
 	local instance = {
-		constructors = List:new(),
 		initialized = false,
 		modules = List:new(),
 		name = name or "WorldGen",
 		noise_manager = noise_manager or NoiseManager:new(),
-		persistent = {}
+		persistent = {},
+		prototypes = List:new()
 	}
 	
 	setmetatable(instance, self)
@@ -80,33 +80,36 @@ function WorldGen:constructor_to_module(constructor)
 		end
 	end)
 	
-	constructor.noises:foreach(function(noise_param, index)
-		local noisemap = nil
-		
-		if noise_param.type == "2D" then
-			noisemap = self.noise_manager:get_map2d(
-				noise_param.octaves,
-				noise_param.persistence,
-				noise_param.scale,
-				noise_param.spreadx,
-				noise_param.spready,
-				noise_param.flags
-			)
-		elseif noise_param.type == "3D" then
-			noisemap = self.noise_manager:get_map3d(
-				noise_param.octaves,
-				noise_param.persistence,
-				noise_param.scale,
-				noise_param.spreadx,
-				noise_param.spready,
-				noise_param.spreadz,
-				noise_param.flags
-			)
-		end
+	constructor.noises2d:foreach(function(noise_param, index)
+		local noisemap = self.noise_manager:get_map2d(
+			noise_param.octaves,
+			noise_param.persistence,
+			noise_param.scale,
+			noise_param.spreadx,
+			noise_param.spready,
+			noise_param.flags
+		)
 		
 		module.noise_objects[noise_param.name] = {
 			map = noisemap,
-			type = noise_param.type
+			type = "2D"
+		}
+	end)
+	
+	constructor.noises3d:foreach(function(noise_param, index)
+		local noisemap = self.noise_manager:get_map3d(
+			noise_param.octaves,
+			noise_param.persistence,
+			noise_param.scale,
+			noise_param.spreadx,
+			noise_param.spready,
+			noise_param.spreadz,
+			noise_param.flags
+		)
+		
+		module.noise_objects[noise_param.name] = {
+			map = noisemap,
+			type = "3D"
 		}
 	end)
 	
@@ -130,7 +133,7 @@ function WorldGen:constructor_to_module(constructor)
 end
 
 function WorldGen:init()
-	self.constructors:foreach(function(constructor, index)
+	self.prototypes:foreach(function(constructor, index)
 		log.info(self.name .. ": Initializing module \"" .. constructor.name .. "\"")
 		local module = self:constructor_to_module(constructor)
 		self.modules:add(module)
@@ -138,8 +141,8 @@ function WorldGen:init()
 	
 	self.initialized = true
 	
-	-- Destroy the constructors so that they can be collected by the GC.
-	self.constructors = nil
+	-- Destroy the prototypes so that they can be collected by the GC.
+	self.prototypes = nil
 end
 
 function WorldGen:prepare_module_noises(module, minp, maxp)
@@ -190,7 +193,7 @@ function WorldGen:register_from_constructor(name, constructor_function)
 	
 	constructor_function(constructor)
 	
-	self.constructors:add(constructor)
+	self.prototypes:add(constructor)
 end
 
 function WorldGen:register_from_table(name, table)
@@ -236,7 +239,7 @@ function WorldGen:register_from_table(name, table)
 	constructor:set_run_after(table.run_after)
 	constructor:set_run_before(table.run_before)
 	
-	self.constructors:add(constructor)
+	self.prototypes:add(constructor)
 end
 
 function WorldGen:run(map_manipulator, minp, maxp, seed)
