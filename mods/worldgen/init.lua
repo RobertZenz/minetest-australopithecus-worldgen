@@ -30,7 +30,7 @@ local base_path = minetest.get_modpath(minetest.get_current_modname())
 dofile(base_path .. "/biomeconstructor.lua")
 dofile(base_path .. "/biomes.lua")
 dofile(base_path .. "/biomesfunctions.lua")
+dofile(base_path .. "/moduleconstructor.lua")
 dofile(base_path .. "/worldgen.lua")
-dofile(base_path .. "/worldgenconstructor.lua")
 dofile(base_path .. "/worldgenfunctions.lua")
 

@@ -69,7 +69,7 @@ end
 function ModuleConstructor:require_node(name, node)
 	self.nodes:add({
 		name = name,
-		node = node_name
+		node = name
 	})
 end
 

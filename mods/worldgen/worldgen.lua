@@ -45,9 +45,11 @@ function WorldGen:new(name, noise_manager)
 end
 
 function WorldGen:init()
+	log.info(self.name .. ": Initializing...")
+	
 	self.prototypes:foreach(function(prototype, index)
 		log.info(self.name .. ": Initializing module \"" .. prototype.name .. "\"")
-		local module = self:constructor_to_module(prototype)
+		local module = self:prototype_to_module(prototype)
 		self.modules:add(module)
 	end)
 	
@@ -95,7 +97,7 @@ end
 function WorldGen:prototype_to_module(prototype)
 	local module = {
 		condition = prototype.condition,
-		name = constructor.name,
+		name = prototype.name,
 		nodes = {},
 		noise_objects = {},
 		noises = {},
@@ -123,7 +125,7 @@ function WorldGen:prototype_to_module(prototype)
 			"\".")
 		
 		if module.nodes[node.name] < 0 or module.nodes[node.name] == 127 then
-			log.error(self.name .. ": Node \"" .. node.node_name .. "\" was not found.")
+			log.error(self.name .. ": Node \"" .. tostring(node.node) .. "\" was not found.")
 		end
 	end)
 	
@@ -186,7 +188,7 @@ function WorldGen:register(name, module)
 		prototype = tableutil.clone(module)
 		prototype.name = name
 	else
-		local prototype = ModuleConstructor:new(name)
+		prototype = ModuleConstructor:new(name)
 		module(prototype)
 	end
 	
