@@ -180,65 +180,17 @@ function WorldGen:prototype_to_module(prototype)
 end
 
 function WorldGen:register(name, module)
+	local prototype = nil
+	
 	if type(module) == "table" then
-		self:register_from_table(name, module)
+		prototype = tableutil.clone(module)
+		prototype.name = name
 	else
-		self:register_from_constructor(name, module)
-	end
-end
-
-function WorldGen:register_from_constructor(name, constructor_function)
-	local constructor = ModuleConstructor:new(name)
-	
-	constructor_function(constructor)
-	
-	self.prototypes:add(constructor)
-end
-
-function WorldGen:register_from_table(name, table)
-	local constructor = ModuleConstructor:new(name)
-	
-	if table.nodes ~= nil then
-		for index, value in ipairs(table.nodes) do
-			constructor:require_node(value.name, value.node_name)
-		end
+		local prototype = ModuleConstructor:new(name)
+		module(prototype)
 	end
 	
-	if table.noises ~= nil then
-		for index, value in ipairs(table.params) do
-			constructor:require_noise(
-				value.name,
-				value.value,
-				value.octaves,
-				value.persistence,
-				value.scale,
-				value.spreadx,
-				value.spready,
-				value.spreadz,
-				value.flags)
-		end
-	end
-	
-	if table.objects ~= nil then
-		for index, value in ipairs(table.objects) do
-			constructor:add_object(value.name, value.object)
-		end
-	end
-	
-	if table.params ~= nil then
-		for index, value in ipairs(table.params) do
-			constructor:add_param(value.name, value.value)
-		end
-	end
-	
-	constructor:set_condition(table.condition)
-	constructor:set_run_before(table.run_before)
-	constructor:set_run_2d(table.run_2d)
-	constructor:set_run_3d(table.run_3d)
-	constructor:set_run_after(table.run_after)
-	constructor:set_run_before(table.run_before)
-	
-	self.prototypes:add(constructor)
+	self.prototypes:add(prototype)
 end
 
 function WorldGen:run(map_manipulator, minp, maxp, seed)
