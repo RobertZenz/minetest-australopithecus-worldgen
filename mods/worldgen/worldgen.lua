@@ -242,7 +242,7 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 					
 					if module.run_3d ~= nil then
 						for y = minp.y, maxp.y, 1 do
-							module.run_3d(module.metadata, map_manipulator, x, z, y)
+							module.run_3d(module, metadata, map_manipulator, x, z, y)
 						end
 					end
 				end
