@@ -253,7 +253,7 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 		end
 	end
 	
-	local total = stopwatch.stop_only("worldgen (" .. self.name .. ")")
+	local total = stopwatch.stop_only("worldgen.module (" .. self.name .. ")")
 	total = mathutil.round(total, 3)
 	
 	log.info("    ", module.name, ": ", total, " ms")
