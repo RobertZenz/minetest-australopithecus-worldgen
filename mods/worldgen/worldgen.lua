@@ -49,6 +49,7 @@ function WorldGen:init()
 	
 	self.prototypes:foreach(function(prototype, index)
 		log.info(self.name .. ": Initializing module \"" .. prototype.name .. "\"")
+		
 		local module = self:prototype_to_module(prototype)
 		self.modules:add(module)
 	end)
@@ -57,6 +58,13 @@ function WorldGen:init()
 	
 	-- Destroy the prototypes so that they can be collected by the GC.
 	self.prototypes = nil
+end
+
+function WorldGen:log_time(name, watch_name)
+	local time = stopwatch.stop_only(watch_name)
+	local formatted_time = numberutil.format(time, 3)
+	
+	log.info("    ", name .. " ", string.rep(".", 50 - #name - #formatted_time), " ", formatted_time, " ms")
 end
 
 function WorldGen:prepare_module_noises(module, minp, maxp)
@@ -200,8 +208,13 @@ function WorldGen:run(map_manipulator, minp, maxp, seed)
 		self:init()
 	end
 	
-	log.info("WorldGen: ", self.name)
-	log.info("    ", minp.x, ", ", minp.y, ", ", minp.z, " / ", maxp.x, ", ", maxp.y, ", ", maxp.z)
+	local separator = string.rep("-", 34 - #self.name)
+	log.info(separator, " ", self.name, " ", separator)
+	
+	local formatted_minp = minp.x .. ", " .. minp.y .. ", " .. minp.z
+	local formatted_maxp = maxp.x .. ", " .. maxp.y .. ", " .. maxp.z
+	local space = string.rep(" ", 38 - #formatted_minp - #formatted_maxp)
+	log.info("    ", formatted_minp, space, " / ", space, formatted_maxp)
 	
 	local metadata = {
 		minp = minp,
@@ -215,14 +228,11 @@ function WorldGen:run(map_manipulator, minp, maxp, seed)
 		self:run_module(module, map_manipulator, metadata, minp, maxp, seed)
 	end)
 	
-	local total = stopwatch.stop_only("worldgen (" .. self.name .. ")")
-	total = mathutil.round(total, 3)
-	
-	log.info("    ", "Total: ", total, " ms")
+	self:log_time("Total", "worldgen (" .. self.name .. ")")
 end
 
 function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed)
-	stopwatch.start("worldgen.module (" .. self.name .. ")")
+	stopwatch.start("worldgen.module (" .. module.name .. ")")
 	
 	if module.condition == nil or module.condition(module, metadata, minp, maxp) then
 		self:prepare_module_noises(module, minp, maxp)
@@ -253,9 +263,6 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 		end
 	end
 	
-	local total = stopwatch.stop_only("worldgen.module (" .. self.name .. ")")
-	total = mathutil.round(total, 3)
-	
-	log.info("    ", module.name, ": ", total, " ms")
+	self:log_time(module.name, "worldgen.module (" .. module.name .. ")")
 end
 
