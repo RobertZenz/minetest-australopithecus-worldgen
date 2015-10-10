@@ -233,15 +233,21 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 			module.run_before(module, metadata, map_manipulator, minp, maxp)
 		end
 		
-		worldgenutil.iterate3d(minp, maxp, function(x, z, y)
-			if module.run_3d ~= nil then
-				module.run_3d(module, metadata, map_manipulator, x, z, y)
+		if module.run_2d ~= nil or module.run_3d ~= nil then
+			for x = minp.x, maxp.x, 1 do
+				for z = minp.z, maxp.z, 1 do
+					if module.run_2d ~= nil then
+						module.run_2d(module, metadata, map_manipulator, x, z)
+					end
+					
+					if module.run_3d ~= nil then
+						for y = minp.y, maxp.y, 1 do
+							module.run_3d(module.metadata, map_manipulator, x, z, y)
+						end
+					end
+				end
 			end
-		end, nil, function(x, z)
-			if module.run_2d ~= nil then
-				module.run_2d(module, metadata, map_manipulator, x, z)
-			end
-		end)
+		end
 		
 		if module.run_after ~= nil then
 			module.run_after(module, metadata, map_manipulator, minp, maxp)
