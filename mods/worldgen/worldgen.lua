@@ -200,10 +200,8 @@ function WorldGen:run(map_manipulator, minp, maxp, seed)
 		self:init()
 	end
 	
-	log.info("")
-	log.info("-------- " .. self.name .. " --------")
-	log.info("From: " .. tableutil.to_string(minp, true, false))
-	log.info("To: " .. tableutil.to_string(maxp, true, false))
+	log.info("WorldGen: ", self.name)
+	log.info("    ", minp.x, ", ", minp.y, ", ", minp.z, " / ", maxp.x, ", ", maxp.y, ", ", maxp.z)
 	
 	local metadata = {
 		minp = minp,
@@ -211,15 +209,16 @@ function WorldGen:run(map_manipulator, minp, maxp, seed)
 		persistent = self.persistent
 	}
 	
-	stopwatch.start("worldgen.modules (" .. self.name .. ")")
+	stopwatch.start("worldgen (" .. self.name .. ")")
 	
 	self.modules:foreach(function(module, index)
 		self:run_module(module, map_manipulator, metadata, minp, maxp, seed)
 	end)
 	
-	log.info("--------------------------")
-	stopwatch.stop("worldgen.modules (" .. self.name .. ")", "Summary")
-	log.info("==========================\n")
+	local total = stopwatch.stop_only("worldgen (" .. self.name .. ")")
+	total = mathutil.round(total, 3)
+	
+	log.info("    ", "Total: ", total, " ms")
 end
 
 function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed)
@@ -254,6 +253,9 @@ function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed
 		end
 	end
 	
-	stopwatch.stop("worldgen.module (" .. self.name .. ")", module.name)
+	local total = stopwatch.stop_only("worldgen (" .. self.name .. ")")
+	total = mathutil.round(total, 3)
+	
+	log.info("    ", module.name, ": ", total, " ms")
 end
 
