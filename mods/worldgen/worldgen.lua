@@ -31,6 +31,11 @@ WorldGen = {}
 function WorldGen:new(name, noise_manager)
 	local instance = {
 		initialized = false,
+		map_size = {
+			x = constants.block_size,
+			y = constants.block_size,
+			z = constants.block_size
+		},
 		modules = List:new(),
 		name = name or "WorldGen",
 		noise_manager = noise_manager or NoiseManager:new(),
@@ -42,6 +47,25 @@ function WorldGen:new(name, noise_manager)
 	self.__index = self
 	
 	return instance
+end
+
+
+function WorldGen:create_noise(module, noise_param)
+	local parameters = {
+		offset = noise_param.offset or 0,
+		scale = noise_param.scale,
+		spread = {
+			x = noise_param.spreadx,
+			y = noise_param.spready or noise_param.spreadx,
+			z = noise_param.spreadz or noise_param.spreadx
+		},
+		seed = noise_param.seed or stringutil.hash(self.name .. module.name .. noise_param.name),
+		octaves = noise_param.octaves,
+		persist = noise_param.persistence,
+		flags = noise_param.flags
+	}
+	
+	return minetest.get_perlin_map(parameters, self.map_size)
 end
 
 function WorldGen:init()
@@ -138,34 +162,15 @@ function WorldGen:prototype_to_module(prototype)
 	end)
 	
 	prototype.noises2d:foreach(function(noise_param, index)
-		local noisemap = self.noise_manager:get_map2d(
-			noise_param.octaves,
-			noise_param.persistence,
-			noise_param.scale,
-			noise_param.spreadx,
-			noise_param.spready,
-			noise_param.flags
-		)
-		
 		module.noise_objects[noise_param.name] = {
-			map = noisemap,
+			map = self:create_noise(module, noise_param),
 			type = "2D"
 		}
 	end)
 	
 	prototype.noises3d:foreach(function(noise_param, index)
-		local noisemap = self.noise_manager:get_map3d(
-			noise_param.octaves,
-			noise_param.persistence,
-			noise_param.scale,
-			noise_param.spreadx,
-			noise_param.spready,
-			noise_param.spreadz,
-			noise_param.flags
-		)
-		
 		module.noise_objects[noise_param.name] = {
-			map = noisemap,
+			map = self:create_noise(module, noise_param),
 			type = "3D"
 		}
 	end)

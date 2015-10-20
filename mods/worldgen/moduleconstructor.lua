@@ -73,7 +73,7 @@ function ModuleConstructor:require_node(name, node)
 	})
 end
 
-function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, spreadx, spready, flags)
+function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, spreadx, spready, flags, seed)
 	self.noises2d:add({
 		name = name,
 		octaves = octaves,
@@ -81,11 +81,12 @@ function ModuleConstructor:require_noise2d(name, octaves, persistence, scale, sp
 		scale = scale,
 		spreadx = spreadx,
 		spready = spready,
-		flags = flags
+		flags = flags,
+		seed = seed
 	})
 end
 		
-function ModuleConstructor:require_noise3d(name, octaves, persistence, scale, spreadx, spready, spreadz, flags)
+function ModuleConstructor:require_noise3d(name, octaves, persistence, scale, spreadx, spready, spreadz, flags, seed)
 	self.noises3d:add({
 		name = name,
 		octaves = octaves,
@@ -94,7 +95,8 @@ function ModuleConstructor:require_noise3d(name, octaves, persistence, scale, sp
 		spreadx = spreadx,
 		spready = spready,
 		spreadz = spreadz,
-		flags = flags
+		flags = flags, 
+		seed = seed
 	})
 end
 
