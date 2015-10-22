@@ -114,14 +114,16 @@ function WorldGen:prepare_module_noises(module, minp, maxp)
 end
 
 function WorldGen:prepare_module_randoms(module, seed)
-	local random_source = PcgRandom(seed)
-	
 	module.pcgrandom_names:foreach(function(pcgrandom_name, index)
-		module.pcgrandoms[pcgrandom_name] = PcgRandom(random_source:next())
+		local hash = stringutil.hash(pcgrandom_name)
+		
+		module.pcgrandoms[pcgrandom_name] = PcgRandom(mathutil.cantor_pairing(seed, hash))
 	end)
 	
 	module.pseudorandom_names:foreach(function(pseudorandom_name, index)
-		module.pseudorandoms[pseudorandom_name] = PseudoRandom(random_source:next())
+		local hash = stringutil.hash(pseudorandom_name)
+		
+		module.pseudorandoms[pseudorandom_name] = PseudoRandom(mathutil.cantor_pairing(seed, hash))
 	end)
 end
 
