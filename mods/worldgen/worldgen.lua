@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 WorldGen = {}
 
 
-function WorldGen:new(name, noise_manager)
+function WorldGen:new(name)
 	local instance = {
 		initialized = false,
 		map_size = {
@@ -38,7 +38,6 @@ function WorldGen:new(name, noise_manager)
 		},
 		modules = List:new(),
 		name = name or "WorldGen",
-		noise_manager = noise_manager or NoiseManager:new(),
 		persistent = {},
 		prototypes = List:new()
 	}
