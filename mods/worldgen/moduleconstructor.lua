@@ -36,6 +36,7 @@ function ModuleConstructor:new(name)
 		noises3d = List:new(),
 		nodes = List:new(),
 		objects = List:new(),
+		on_init = nil,
 		params = List:new(),
 		pcgrandoms = List:new(),
 		pseudorandoms = List:new(),
@@ -114,6 +115,10 @@ end
 
 function ModuleConstructor:set_condition(condition_function)
 	self.condition = condition_function
+end
+
+function ModuleConstructor:set_on_init(on_init_function)
+	self.on_init = on_init_function
 end
 
 function ModuleConstructor:set_run_2d(run_function)

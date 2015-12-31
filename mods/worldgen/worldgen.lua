@@ -77,10 +77,16 @@ function WorldGen:init()
 		self.modules:add(module)
 	end)
 	
-	self.initialized = true
-	
 	-- Destroy the prototypes so that they can be collected by the GC.
 	self.prototypes = nil
+	
+	self.modules:foreach(function(module, index)
+		if module.on_init ~= nil then
+			module.on_init(module)
+		end
+	end)
+	
+	self.initialized = true
 end
 
 function WorldGen:log_time(name, watch_name)
@@ -135,6 +141,7 @@ function WorldGen:prototype_to_module(prototype)
 		noise_objects = {},
 		noises = {},
 		objects = {},
+		on_init = prototype.on_init,
 		params = {},
 		pcgrandom_names = List:new(),
 		pcgrandoms = {},
