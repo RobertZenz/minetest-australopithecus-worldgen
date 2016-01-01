@@ -32,9 +32,9 @@ function WorldGen:new(name)
 	local instance = {
 		initialized = false,
 		map_size = {
-			x = constants.block_size,
-			y = constants.block_size,
-			z = constants.block_size
+			x = blockutil.MAPCHUNK_SIZE,
+			y = blockutil.MAPCHUNK_SIZE,
+			z = blockutil.MAPCHUNK_SIZE
 		},
 		modules = List:new(),
 		name = name or "WorldGen",
