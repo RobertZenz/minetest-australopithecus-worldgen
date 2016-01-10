@@ -39,7 +39,7 @@ function WorldGen:new(name)
 		modules = List:new(),
 		name = name or "WorldGen",
 		persistent = {},
-		prototypes = List:new()
+		prototypes = List:new(),
 	}
 	
 	setmetatable(instance, self)
@@ -216,7 +216,7 @@ function WorldGen:register(name, module)
 	self.prototypes:add(prototype)
 end
 
-function WorldGen:run(map_manipulator, minp, maxp, seed)
+function WorldGen:run(map_manipulator, minp, maxp, seed, save)
 	if not self.initialized then
 		self:init()
 	end
@@ -242,6 +242,12 @@ function WorldGen:run(map_manipulator, minp, maxp, seed)
 	end)
 	
 	self:log_time("Total", "worldgen (" .. self.name .. ")")
+	
+	if save then
+		stopwatch.start("worldgen.saving (" .. self.name .. ")")
+		map_manipulator:set_data()
+		self:log_time("Saving", "worldgen.saving (" .. self.name .. ")")
+	end
 end
 
 function WorldGen:run_module(module, map_manipulator, metadata, minp, maxp, seed)
