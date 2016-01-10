@@ -107,7 +107,6 @@ function worldgenfunctions.masked_noise_2d(name, info_name, flag_name, flag_valu
 		if mask_value >= module.params.threshold_mask_min and mask_value <= module.params.threshold_mask_max then
 			local value = module.noises.main[x][z]
 			value = transform.linear(value, -1, 1, 0, 1)
-			value = mathutil.clamp(value, 0, 1)
 			
 			if module.params.smoothed then
 				value = worldgenfunctions.fade(value, mask_value, module)
@@ -155,7 +154,6 @@ function worldgenfunctions.masked_ridged_noise_2d(name, info_name, flag_name, fl
 		
 		if mask_value >= module.params.threshold_mask_min and mask_value <= module.params.threshold_mask_max then
 			local value = module.noises.ridged[x][z]
-			value = mathutil.clamp(value, -1, 1)
 			
 			if value >= module.params.threshold_min and value <= module.params.threshold_max then
 				value = transform.centered_linear(
@@ -184,7 +182,6 @@ end
 function worldgenfunctions.multiplied_noise_2d(name)
 	return function(module, metadata, manipulator, x, z)
 		local value = module.noises.main[x][z]
-		value = mathutil.clamp(value, -1, 1)
 		value = value * module.params.multiplier
 		
 		metadata[name][x][z] = metadata[name][x][z] + value
@@ -194,7 +191,6 @@ end
 function worldgenfunctions.ranged_noise_2d(name)
 	return function(module, metadata, manipulator, x, z)
 		local value = module.noises.main[x][z]
-		value = mathutil.clamp(value, -1, 1)
 		value = transform.linear(
 			value,
 			-1,
